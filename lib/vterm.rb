@@ -1,6 +1,6 @@
-require "libvterm/version"
+require "vterm/version"
 
-module Libvterm
+module VTerm
   class Error < StandardError; end
   # Your code goes here...
 end
