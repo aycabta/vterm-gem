@@ -7,3 +7,7 @@
 /spec/reports/
 /tmp/
 *.swp
+Makefile
+mkmf.log
+vterm.o
+vterm.so
