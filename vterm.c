@@ -184,12 +184,15 @@ static void
 rb_vterm_free(void *ptr);
 static VALUE
 rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols);
+static VALUE
+rb_vterm_obtain_screen(VALUE self);
 void
 Init_vterm(void);
 
 
 typedef struct {
     VTerm *vt;
+    VTermScreen *vtscreen;
 } vterm_data_t;
 
 static const rb_data_type_t rb_vterm_type = {
@@ -225,6 +228,17 @@ rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols)
     return Qnil;
 }
 
+static VALUE
+rb_vterm_obtain_screen(VALUE self)
+{
+    vterm_data_t *vt_data = (vterm_data_t*)DATA_PTR(self);
+
+    TypedData_Get_Struct(self, vterm_data_t, &rb_vterm_type, vt_data);
+    vt_data->vtscreen = vterm_obtain_screen(vt_data->vt);
+
+    return Qnil;
+}
+
 static VALUE vterm;
 
 void
@@ -233,4 +247,5 @@ Init_vterm(void)
     vterm = rb_define_module("VTerm");
     rb_define_alloc_func(vterm, rb_vterm_alloc);
     rb_define_method(vterm, "initialize", rb_vterm_initialize, 2);
+    rb_define_module_function(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
 }
