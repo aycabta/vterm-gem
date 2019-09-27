@@ -25,6 +25,8 @@ static VALUE
 rb_vterm_screen_initialize(VALUE self);
 static VALUE
 rb_vterm_obtain_screen(VALUE self);
+static VALUE
+rb_vterm_screen_reset(VALUE self, VALUE hard);
 void
 Init_vterm(void);
 
@@ -122,6 +124,21 @@ rb_vterm_obtain_screen(VALUE self)
     return vt_screen;
 }
 
+static VALUE
+rb_vterm_screen_reset(VALUE self, VALUE hard)
+{
+    vterm_screen_data_t *vt_screen_data;
+
+    vt_screen_data = (vterm_screen_data_t*)DATA_PTR(self);
+    if (rb_equal(hard, Qfalse) || rb_equal(hard, Qnil)) {
+        vterm_screen_reset(vt_screen_data->vtscreen, 0);
+    } else {
+        vterm_screen_reset(vt_screen_data->vtscreen, 1);
+    }
+
+    return Qnil;
+}
+
 void
 Init_vterm(void)
 {
@@ -133,4 +150,5 @@ Init_vterm(void)
     vterm_screen = rb_define_class_under(vterm, "Screen", rb_cObject);
     rb_define_alloc_func(vterm, rb_vterm_screen_alloc);
     rb_define_method(vterm_screen, "initialize", rb_vterm_screen_initialize, 0);
+    rb_define_method(vterm_screen, "reset", rb_vterm_screen_reset, 1);
 }
