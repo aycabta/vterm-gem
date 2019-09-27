@@ -80,5 +80,5 @@ Init_vterm(void)
     vterm = rb_define_class("VTerm", rb_cObject);
     rb_define_alloc_func(vterm, rb_vterm_alloc);
     rb_define_method(vterm, "initialize", rb_vterm_initialize, 2);
-    rb_define_module_function(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
+    rb_define_method(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
 }
