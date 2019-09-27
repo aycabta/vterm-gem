@@ -16,21 +16,39 @@ rb_vterm_alloc(VALUE klass);
 static void
 rb_vterm_free(void *ptr);
 static VALUE
+rb_vterm_screen_alloc(VALUE klass);
+static void
+rb_vterm_screen_free(void *ptr);
+static VALUE
 rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols);
+static VALUE
+rb_vterm_screen_initialize(VALUE self);
 static VALUE
 rb_vterm_obtain_screen(VALUE self);
 void
 Init_vterm(void);
 
+static VALUE vterm;
+static VALUE vterm_screen;
 
 typedef struct {
     VTerm *vt;
-    VTermScreen *vtscreen;
 } vterm_data_t;
+
+typedef struct {
+    VTermScreen *vtscreen;
+} vterm_screen_data_t;
 
 static const rb_data_type_t rb_vterm_type = {
     "vterm",
     {NULL, rb_vterm_free, NULL},
+    NULL, NULL,
+    RUBY_TYPED_FREE_IMMEDIATELY
+};
+
+static const rb_data_type_t rb_vterm_screen_type = {
+    "vterm_screen",
+    {NULL, rb_vterm_screen_free, NULL},
     NULL, NULL,
     RUBY_TYPED_FREE_IMMEDIATELY
 };
@@ -49,6 +67,19 @@ rb_vterm_free(void *ptr)
 }
 
 static VALUE
+rb_vterm_screen_alloc(VALUE klass)
+{
+    return TypedData_Wrap_Struct(klass, &rb_vterm_screen_type, NULL);
+}
+
+static void
+rb_vterm_screen_free(void *ptr)
+{
+    vterm_screen_data_t *vt_screen_data = ptr;
+    free(vt_screen_data);
+}
+
+static VALUE
 rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols)
 {
     vterm_data_t *vt_data;
@@ -62,17 +93,34 @@ rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols)
 }
 
 static VALUE
-rb_vterm_obtain_screen(VALUE self)
+rb_vterm_screen_initialize(VALUE self)
 {
-    vterm_data_t *vt_data = (vterm_data_t*)DATA_PTR(self);
+    vterm_screen_data_t *vt_screen_data;
 
-    TypedData_Get_Struct(self, vterm_data_t, &rb_vterm_type, vt_data);
-    vt_data->vtscreen = vterm_obtain_screen(vt_data->vt);
+    vt_screen_data = malloc(sizeof(vterm_screen_data_t));
+    DATA_PTR(self) = vt_screen_data;
 
     return Qnil;
 }
 
-static VALUE vterm;
+static VALUE
+rb_vterm_obtain_screen(VALUE self)
+{
+    vterm_data_t *vt_data;
+    vterm_screen_data_t *vt_screen_data;
+    ID screen_new_id;
+    VALUE vt_screen;
+
+    vt_data = (vterm_data_t*)DATA_PTR(self);
+    screen_new_id = rb_intern("new");
+    vt_screen = rb_funcall(vterm_screen, screen_new_id, 0);
+
+    vt_screen_data = malloc(sizeof(vterm_screen_data_t));
+    vt_screen_data->vtscreen = vterm_obtain_screen(vt_data->vt);
+    DATA_PTR(vt_screen) = vt_screen_data;
+
+    return vt_screen;
+}
 
 void
 Init_vterm(void)
