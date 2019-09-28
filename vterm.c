@@ -26,6 +26,8 @@ rb_vterm_screen_initialize(VALUE self);
 static VALUE
 rb_vterm_obtain_screen(VALUE self);
 static VALUE
+rb_vterm_set_utf8(VALUE self, VALUE is_utf8);
+static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
 void
 Init_vterm(void);
@@ -125,6 +127,21 @@ rb_vterm_obtain_screen(VALUE self)
 }
 
 static VALUE
+rb_vterm_set_utf8(VALUE self, VALUE is_utf8)
+{
+    vterm_data_t *vt_data;
+
+    vt_data = (vterm_data_t*)DATA_PTR(self);
+    if (rb_equal(is_utf8, Qfalse) || rb_equal(is_utf8, Qnil)) {
+        vterm_set_utf8(vt_data->vt, 0);
+    } else {
+        vterm_set_utf8(vt_data->vt, 1);
+    }
+
+    return Qnil;
+}
+
+static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard)
 {
     vterm_screen_data_t *vt_screen_data;
@@ -146,6 +163,7 @@ Init_vterm(void)
     rb_define_alloc_func(vterm, rb_vterm_alloc);
     rb_define_method(vterm, "initialize", rb_vterm_initialize, 2);
     rb_define_method(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
+    rb_define_method(vterm, "set_utf8", rb_vterm_set_utf8, 1);
 
     vterm_screen = rb_define_class_under(vterm, "Screen", rb_cObject);
     rb_define_alloc_func(vterm, rb_vterm_screen_alloc);
