@@ -31,6 +31,8 @@ static VALUE
 rb_vterm_input_write(VALUE self, VALUE bytes);
 static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
+static VALUE
+rb_vterm_screen_flush_damage(VALUE self, VALUE hard);
 void
 Init_vterm(void);
 
@@ -171,6 +173,17 @@ rb_vterm_screen_reset(VALUE self, VALUE hard)
     return Qnil;
 }
 
+static VALUE
+rb_vterm_screen_flush_damage(VALUE self, VALUE hard)
+{
+    vterm_screen_data_t *vt_screen_data;
+
+    vt_screen_data = (vterm_screen_data_t*)DATA_PTR(self);
+    vterm_screen_flush_damage(vt_screen_data->vtscreen);
+
+    return Qnil;
+}
+
 void
 Init_vterm(void)
 {
@@ -185,4 +198,5 @@ Init_vterm(void)
     rb_define_alloc_func(vterm, rb_vterm_screen_alloc);
     rb_define_method(vterm_screen, "initialize", rb_vterm_screen_initialize, 0);
     rb_define_method(vterm_screen, "reset", rb_vterm_screen_reset, 1);
+    rb_define_method(vterm_screen, "flush_damage", rb_vterm_screen_flush_damage, 0);
 }
