@@ -71,6 +71,7 @@ static void
 rb_vterm_free(void *ptr)
 {
     vterm_data_t *vt_data = ptr;
+    vterm_free(vt_data->vt);
     free(vt_data);
 }
 
