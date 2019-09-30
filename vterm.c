@@ -32,7 +32,7 @@ rb_vterm_input_write(VALUE self, VALUE bytes);
 static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
 static VALUE
-rb_vterm_screen_flush_damage(VALUE self, VALUE hard);
+rb_vterm_screen_flush_damage(VALUE self);
 void
 Init_vterm(void);
 
@@ -175,7 +175,7 @@ rb_vterm_screen_reset(VALUE self, VALUE hard)
 }
 
 static VALUE
-rb_vterm_screen_flush_damage(VALUE self, VALUE hard)
+rb_vterm_screen_flush_damage(VALUE self)
 {
     vterm_screen_data_t *vt_screen_data;
 
