@@ -22,6 +22,8 @@ rb_vterm_screen_free(void *ptr);
 static VALUE
 rb_vterm_initialize(VALUE self, VALUE rows, VALUE cols);
 static VALUE
+rb_vterm_get_size(VALUE self);
+static VALUE
 rb_vterm_screen_initialize(VALUE self);
 static VALUE
 rb_vterm_obtain_screen(VALUE self);
@@ -160,6 +162,23 @@ rb_vterm_input_write(VALUE self, VALUE bytes)
 }
 
 static VALUE
+rb_vterm_get_size(VALUE self)
+{
+    int rows, cols;
+    vterm_data_t *vt_data;
+    VALUE result;
+
+    vt_data = (vterm_data_t*)DATA_PTR(self);
+    vterm_get_size(vt_data->vt, &rows, &cols);
+
+    result = rb_ary_new();
+    rb_ary_push(result, INT2NUM(rows));
+    rb_ary_push(result, INT2NUM(cols));
+
+    return result;
+}
+
+static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard)
 {
     vterm_screen_data_t *vt_screen_data;
@@ -194,6 +213,7 @@ Init_vterm(void)
     rb_define_method(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
     rb_define_method(vterm, "set_utf8", rb_vterm_set_utf8, 1);
     rb_define_method(vterm, "input_write", rb_vterm_input_write, 1);
+    rb_define_method(vterm, "size", rb_vterm_get_size, 0);
 
     vterm_screen = rb_define_class_under(vterm, "Screen", rb_cObject);
     rb_define_alloc_func(vterm, rb_vterm_screen_alloc);
