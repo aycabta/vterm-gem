@@ -5,14 +5,14 @@ require "vterm/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "vterm"
-  spec.version       = Libvterm::VERSION
+  spec.version       = VTerm::VERSION
   spec.authors       = ["aycabta"]
   spec.email         = ["aycabta@gmail.com"]
 
   spec.summary       = %q{A wrapper library of libvterm}
   spec.description   = %q{A wrapper library of libvterm}
   spec.homepage      = "https://github.com/aycabta/vterm-gem"
-  spec.extensions    = %s[ext/immutable_list/extconf.rb]
+  spec.extensions    = %w[ext/vterm/extconf.rb]
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
