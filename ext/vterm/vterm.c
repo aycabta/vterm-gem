@@ -38,8 +38,8 @@ rb_vterm_screen_flush_damage(VALUE self);
 void
 Init_vterm(void);
 
-static VALUE vterm;
-static VALUE vterm_screen;
+static VALUE cVTerm;
+static VALUE cVTermScreen;
 
 typedef struct {
     VTerm *vt;
@@ -124,7 +124,7 @@ rb_vterm_obtain_screen(VALUE self)
 
     vt_data = (vterm_data_t*)DATA_PTR(self);
     screen_new_id = rb_intern("new");
-    vt_screen = rb_funcall(vterm_screen, screen_new_id, 0);
+    vt_screen = rb_funcall(cVTermScreen, screen_new_id, 0);
 
     vt_screen_data = malloc(sizeof(vterm_screen_data_t));
     vt_screen_data->vtscreen = vterm_obtain_screen(vt_data->vt);
@@ -207,17 +207,17 @@ rb_vterm_screen_flush_damage(VALUE self)
 void
 Init_vterm(void)
 {
-    vterm = rb_define_class("VTerm", rb_cObject);
-    rb_define_alloc_func(vterm, rb_vterm_alloc);
-    rb_define_method(vterm, "initialize", rb_vterm_initialize, 2);
-    rb_define_method(vterm, "obtain_screen", rb_vterm_obtain_screen, 0);
-    rb_define_method(vterm, "set_utf8", rb_vterm_set_utf8, 1);
-    rb_define_method(vterm, "input_write", rb_vterm_input_write, 1);
-    rb_define_method(vterm, "size", rb_vterm_get_size, 0);
+    cVTerm = rb_define_class("VTerm", rb_cObject);
+    rb_define_alloc_func(cVTerm, rb_vterm_alloc);
+    rb_define_method(cVTerm, "initialize", rb_vterm_initialize, 2);
+    rb_define_method(cVTerm, "obtain_screen", rb_vterm_obtain_screen, 0);
+    rb_define_method(cVTerm, "set_utf8", rb_vterm_set_utf8, 1);
+    rb_define_method(cVTerm, "input_write", rb_vterm_input_write, 1);
+    rb_define_method(cVTerm, "size", rb_vterm_get_size, 0);
 
-    vterm_screen = rb_define_class_under(vterm, "Screen", rb_cObject);
-    rb_define_alloc_func(vterm, rb_vterm_screen_alloc);
-    rb_define_method(vterm_screen, "initialize", rb_vterm_screen_initialize, 0);
-    rb_define_method(vterm_screen, "reset", rb_vterm_screen_reset, 1);
-    rb_define_method(vterm_screen, "flush_damage", rb_vterm_screen_flush_damage, 0);
+    cVTermScreen = rb_define_class_under(cVTerm, "Screen", rb_cObject);
+    rb_define_alloc_func(cVTerm, rb_vterm_screen_alloc);
+    rb_define_method(cVTermScreen, "initialize", rb_vterm_screen_initialize, 0);
+    rb_define_method(cVTermScreen, "reset", rb_vterm_screen_reset, 1);
+    rb_define_method(cVTermScreen, "flush_damage", rb_vterm_screen_flush_damage, 0);
 }
