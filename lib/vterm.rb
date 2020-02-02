@@ -1,4 +1,4 @@
-require "vterm/version"
+require 'vterm/version'
 
 module VTerm
   class Error < StandardError; end
