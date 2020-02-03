@@ -35,11 +35,19 @@ static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
 static VALUE
 rb_vterm_screen_flush_damage(VALUE self);
+static VALUE
+generate_color_object(VTermColor color);
+static VALUE
+rb_vterm_screen_get_cell(VALUE self, VALUE row, VALUE col);
 void
 Init_vterm(void);
 
 static VALUE cVTerm;
 static VALUE cVTermScreen;
+static VALUE sVTermScreenCell;
+static VALUE sVTermScreenCellAttrs;
+static VALUE sVTermColorRGB;
+static VALUE sVTermColorIndexed;
 
 typedef struct {
     VTerm *vt;
@@ -204,6 +212,97 @@ rb_vterm_screen_flush_damage(VALUE self)
     return Qnil;
 }
 
+static VALUE
+generate_color_object(VTermColor color)
+{
+    VALUE type;
+
+    if (VTERM_COLOR_IS_DEFAULT_FG(&color)) {
+        type = rb_to_symbol(rb_str_new_cstr("fg"));
+    } else if (VTERM_COLOR_IS_DEFAULT_BG(&color)) {
+        type = rb_to_symbol(rb_str_new_cstr("bg"));
+    } else {
+        type = Qnil;
+    }
+    if (VTERM_COLOR_IS_RGB(&color)) {
+        return rb_struct_new(
+            sVTermColorRGB,
+            type,
+            INT2NUM(color.rgb.red),
+            INT2NUM(color.rgb.green),
+            INT2NUM(color.rgb.blue),
+            0
+        );
+    } else if (VTERM_COLOR_IS_INDEXED(&color)) {
+        return rb_struct_new(
+            sVTermColorIndexed,
+            type,
+            INT2NUM(color.indexed.idx),
+            0
+        );
+    } else {
+        return Qnil;
+    }
+}
+
+static VALUE
+rb_vterm_screen_get_cell(VALUE self, VALUE row, VALUE col)
+{
+    vterm_screen_data_t *vt_screen_data;
+    VTermPos pos;
+    VTermScreenCell cell;
+    int result;
+    VALUE rb_cell;
+    VALUE rb_attrs;
+    VALUE chars;
+    VALUE fg;
+    VALUE bg;
+
+    vt_screen_data = (vterm_screen_data_t*)DATA_PTR(self);
+
+    pos.row = NUM2INT(row);
+    pos.col = NUM2INT(col);
+    result = vterm_screen_get_cell(vt_screen_data->vtscreen, pos, &cell);
+    rb_attrs = rb_struct_new(
+        sVTermScreenCellAttrs,
+        INT2NUM(cell.attrs.bold),
+        INT2NUM(cell.attrs.underline),
+        INT2NUM(cell.attrs.italic),
+        INT2NUM(cell.attrs.blink),
+        INT2NUM(cell.attrs.reverse),
+        INT2NUM(cell.attrs.strike),
+        INT2NUM(cell.attrs.font),
+        INT2NUM(cell.attrs.dwl),
+        INT2NUM(cell.attrs.dhl),
+        0
+    );
+    fg = generate_color_object(cell.fg);
+    bg = generate_color_object(cell.bg);
+    chars = rb_external_str_new_cstr("");
+    for (int i = 0; i < cell.width; i++) {
+        if (cell.chars[i] == 0xFFFFFFFF) {
+            // The previous sell has full-width character
+            chars = Qnil;
+            break;
+        } else if (cell.chars[i] == 0x00000000) {
+            // NULL termination
+            break;
+        } else {
+            rb_str_concat(chars, INT2NUM(cell.chars[i]));
+        }
+    }
+    rb_cell = rb_struct_new(
+        sVTermScreenCell,
+        chars,
+        rb_attrs,
+        fg,
+        bg,
+        0
+    );
+
+    return rb_cell;
+}
+
 void
 Init_vterm(void)
 {
@@ -220,4 +319,10 @@ Init_vterm(void)
     rb_define_method(cVTermScreen, "initialize", rb_vterm_screen_initialize, 0);
     rb_define_method(cVTermScreen, "reset", rb_vterm_screen_reset, 1);
     rb_define_method(cVTermScreen, "flush_damage", rb_vterm_screen_flush_damage, 0);
+    rb_define_method(cVTermScreen, "get_cell", rb_vterm_screen_get_cell, 2);
+
+    sVTermScreenCell = rb_struct_define_under(cVTermScreen, "Cell", "chars", "attrs", "fg", "bg", NULL);
+    sVTermScreenCellAttrs = rb_struct_define_under(cVTermScreen, "CellAttrs", "bold", "underline", "italic", "blink", "reverse", "strike", "font", "dwl", "dhl", NULL);
+    sVTermColorRGB = rb_struct_define_under(cVTerm, "ColorRGB", "type", "red", "green", "blue", NULL);
+    sVTermColorIndexed = rb_struct_define_under(cVTerm, "ColorIndexed", "type", "index", NULL);
 }
