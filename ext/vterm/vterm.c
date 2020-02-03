@@ -30,15 +30,15 @@ rb_vterm_obtain_screen(VALUE self);
 static VALUE
 rb_vterm_set_utf8(VALUE self, VALUE is_utf8);
 static VALUE
-rb_vterm_input_write(VALUE self, VALUE bytes);
+rb_vterm_write(VALUE self, VALUE bytes);
 static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
 static VALUE
-rb_vterm_screen_flush_damage(VALUE self);
+rb_vterm_screen_flush(VALUE self);
 static VALUE
 generate_color_object(VTermColor color);
 static VALUE
-rb_vterm_screen_get_cell(VALUE self, VALUE row, VALUE col);
+rb_vterm_screen_cell_at(VALUE self, VALUE row, VALUE col);
 void
 Init_vterm(void);
 
@@ -157,7 +157,7 @@ rb_vterm_set_utf8(VALUE self, VALUE is_utf8)
 }
 
 static VALUE
-rb_vterm_input_write(VALUE self, VALUE bytes)
+rb_vterm_write(VALUE self, VALUE bytes)
 {
     vterm_data_t *vt_data;
     char *str;
@@ -202,7 +202,7 @@ rb_vterm_screen_reset(VALUE self, VALUE hard)
 }
 
 static VALUE
-rb_vterm_screen_flush_damage(VALUE self)
+rb_vterm_screen_flush(VALUE self)
 {
     vterm_screen_data_t *vt_screen_data;
 
@@ -246,7 +246,7 @@ generate_color_object(VTermColor color)
 }
 
 static VALUE
-rb_vterm_screen_get_cell(VALUE self, VALUE row, VALUE col)
+rb_vterm_screen_cell_at(VALUE self, VALUE row, VALUE col)
 {
     vterm_screen_data_t *vt_screen_data;
     VTermPos pos;
@@ -311,15 +311,15 @@ Init_vterm(void)
     rb_define_method(cVTerm, "initialize", rb_vterm_initialize, 2);
     rb_define_method(cVTerm, "obtain_screen", rb_vterm_obtain_screen, 0);
     rb_define_method(cVTerm, "set_utf8", rb_vterm_set_utf8, 1);
-    rb_define_method(cVTerm, "input_write", rb_vterm_input_write, 1);
+    rb_define_method(cVTerm, "write", rb_vterm_write, 1);
     rb_define_method(cVTerm, "size", rb_vterm_get_size, 0);
 
     cVTermScreen = rb_define_class_under(cVTerm, "Screen", rb_cObject);
     rb_define_alloc_func(cVTerm, rb_vterm_screen_alloc);
     rb_define_method(cVTermScreen, "initialize", rb_vterm_screen_initialize, 0);
     rb_define_method(cVTermScreen, "reset", rb_vterm_screen_reset, 1);
-    rb_define_method(cVTermScreen, "flush_damage", rb_vterm_screen_flush_damage, 0);
-    rb_define_method(cVTermScreen, "get_cell", rb_vterm_screen_get_cell, 2);
+    rb_define_method(cVTermScreen, "flush", rb_vterm_screen_flush, 0);
+    rb_define_method(cVTermScreen, "cell_at", rb_vterm_screen_cell_at, 2);
 
     sVTermScreenCell = rb_struct_define_under(cVTermScreen, "Cell", "chars", "attrs", "fg", "bg", NULL);
     sVTermScreenCellAttrs = rb_struct_define_under(cVTermScreen, "CellAttrs", "bold", "underline", "italic", "blink", "reverse", "strike", "font", "dwl", "dhl", NULL);
