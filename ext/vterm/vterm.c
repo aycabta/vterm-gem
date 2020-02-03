@@ -156,7 +156,7 @@ rb_vterm_input_write(VALUE self, VALUE bytes)
 
     vt_data = (vterm_data_t*)DATA_PTR(self);
     str = StringValueCStr(bytes);
-    vterm_input_write(vt_data->vt, str, sizeof(str));
+    vterm_input_write(vt_data->vt, str, strlen(str));
 
     return Qnil;
 }
