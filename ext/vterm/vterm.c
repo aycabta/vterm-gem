@@ -325,7 +325,7 @@ Init_vterm(void)
     rb_define_method(cVTermScreen, "flush", rb_vterm_screen_flush, 0);
     rb_define_method(cVTermScreen, "cell_at", rb_vterm_screen_cell_at, 2);
 
-    sVTermScreenCell = rb_struct_define_under(cVTermScreen, "Cell", "chars", "attrs", "fg", "bg", NULL);
+    sVTermScreenCell = rb_struct_define_under(cVTermScreen, "Cell", "char", "attrs", "fg", "bg", NULL);
     sVTermScreenCellAttrs = rb_struct_define_under(cVTermScreen, "CellAttrs", "bold", "underline", "italic", "blink", "reverse", "strike", "font", "dwl", "dhl", NULL);
     sVTermColorRGB = rb_struct_define_under(cVTerm, "ColorRGB", "type", "red", "green", "blue", NULL);
     sVTermColorIndexed = rb_struct_define_under(cVTerm, "ColorIndexed", "type", "index", NULL);
