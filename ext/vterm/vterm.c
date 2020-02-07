@@ -26,7 +26,7 @@ rb_vterm_get_size(VALUE self);
 static VALUE
 rb_vterm_screen_initialize(VALUE self);
 static VALUE
-rb_vterm_obtain_screen(VALUE self);
+rb_vterm_screen(VALUE self);
 static VALUE
 rb_vterm_set_utf8(VALUE self, VALUE is_utf8);
 static VALUE
@@ -123,7 +123,7 @@ rb_vterm_screen_initialize(VALUE self)
 }
 
 static VALUE
-rb_vterm_obtain_screen(VALUE self)
+rb_vterm_screen(VALUE self)
 {
     vterm_data_t *vt_data;
     vterm_screen_data_t *vt_screen_data;
@@ -313,7 +313,7 @@ Init_vterm(void)
     cVTerm = rb_define_class("VTerm", rb_cObject);
     rb_define_alloc_func(cVTerm, rb_vterm_alloc);
     rb_define_method(cVTerm, "initialize", rb_vterm_initialize, 2);
-    rb_define_method(cVTerm, "obtain_screen", rb_vterm_obtain_screen, 0);
+    rb_define_method(cVTerm, "screen", rb_vterm_screen, 0);
     rb_define_method(cVTerm, "set_utf8", rb_vterm_set_utf8, 1);
     rb_define_method(cVTerm, "write", rb_vterm_write, 1);
     rb_define_method(cVTerm, "size", rb_vterm_get_size, 0);
