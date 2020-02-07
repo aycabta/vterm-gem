@@ -16,6 +16,14 @@ class VTerm::Test < Test::Unit::TestCase
     assert_equal([1, 20], vterm.size)
   end
 
+  def test_obtain_screen
+    vterm = VTerm.new(1, 20)
+    vterm.set_utf8(true)
+
+    screen = vterm.obtain_screen
+    assert_equal(VTerm::Screen, screen.class)
+  end
+
   def test_screen_cell_char
     vterm = VTerm.new(1, 20)
     vterm.set_utf8(true)
