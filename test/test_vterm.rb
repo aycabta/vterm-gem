@@ -21,7 +21,7 @@ class VTerm::Test < Test::Unit::TestCase
     vterm.set_utf8(true)
 
     screen = vterm.screen
-    assert_equal(VTerm::Screen, screen.class)
+    assert_kind_of(VTerm::Screen, screen)
   end
 
   def test_screen_cell_char
