@@ -42,4 +42,18 @@ class VTerm::Test < Test::Unit::TestCase
       end
     end
   end
+
+  def test_read
+    vterm = VTerm.new(1, 20)
+    vterm.set_utf8(true)
+
+    screen = vterm.screen
+    screen.reset(true)
+
+    vterm.write("\e[6n")
+    assert_equal("\e[1;1R", vterm.read)
+    vterm.write("aiueo\e[6n")
+    assert_equal("\e[1;", vterm.read(4))
+    assert_equal("6R", vterm.read(4))
+  end
 end

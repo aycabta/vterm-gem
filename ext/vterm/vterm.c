@@ -32,6 +32,8 @@ rb_vterm_set_utf8(VALUE self, VALUE is_utf8);
 static VALUE
 rb_vterm_write(VALUE self, VALUE bytes);
 static VALUE
+rb_vterm_read(int argc, VALUE *argv, VALUE self);
+static VALUE
 rb_vterm_screen_reset(VALUE self, VALUE hard);
 static VALUE
 rb_vterm_screen_flush(VALUE self);
@@ -167,6 +169,35 @@ rb_vterm_write(VALUE self, VALUE bytes)
     vterm_input_write(vt_data->vt, str, strlen(str));
 
     return Qnil;
+}
+
+static VALUE
+rb_vterm_read(int argc, VALUE *argv, VALUE self)
+{
+    vterm_data_t *vt_data;
+    size_t bufsize;
+    size_t specified_size;
+
+    vt_data = (vterm_data_t*)DATA_PTR(self);
+    bufsize = vterm_output_get_buffer_current(vt_data->vt);
+    if (argc == 1) {
+        specified_size = (size_t)NUM2INT(argv[0]);
+        if (specified_size < bufsize) {
+            bufsize = specified_size;
+        }
+    } else if (argc != 0) {
+        // TODO argument error
+        return Qnil;
+    }
+    if (bufsize == 0) {
+        return rb_str_new_cstr("");
+    } else if (bufsize > 0) {
+        char outbuf[bufsize];
+        vterm_output_read(vt_data->vt, outbuf, bufsize);
+        return rb_str_new(outbuf, bufsize);
+    } else {
+        return Qnil;
+    }
 }
 
 static VALUE
@@ -316,6 +347,7 @@ Init_vterm(void)
     rb_define_method(cVTerm, "screen", rb_vterm_screen, 0);
     rb_define_method(cVTerm, "set_utf8", rb_vterm_set_utf8, 1);
     rb_define_method(cVTerm, "write", rb_vterm_write, 1);
+    rb_define_method(cVTerm, "read", rb_vterm_read, -1);
     rb_define_method(cVTerm, "size", rb_vterm_get_size, 0);
 
     cVTermScreen = rb_define_class_under(cVTerm, "Screen", rb_cObject);
