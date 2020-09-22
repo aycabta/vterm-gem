@@ -56,4 +56,29 @@ class VTerm::Test < Test::Unit::TestCase
     assert_equal("\e[1;", vterm.read(4))
     assert_equal("6R", vterm.read(4))
   end
+
+  def test_width
+    vterm = VTerm.new(2, 5)
+    vterm.set_utf8(true)
+
+    screen = vterm.screen
+    screen.reset(true)
+
+    vterm.write("abcdefg")
+    result = ''
+    rows, cols = vterm.size
+    rows.times do |r|
+      line = ''
+      cols.times do |c|
+        cell = screen.cell_at(r, c)
+        line << cell.char if cell.char
+      end
+      line.gsub!(/ *$/, '')
+      result << line + "\n"
+    end
+    assert_equal(<<~EXPECTED, result)
+      abcde
+      fg
+    EXPECTED
+  end
 end
