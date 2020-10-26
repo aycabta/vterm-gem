@@ -12,8 +12,9 @@ Gem::Specification.new do |spec|
   spec.description   = %q{A wrapper library of libvterm}
   spec.homepage      = 'https://github.com/aycabta/vterm-gem'
   spec.extensions    = %w[ext/vterm/extconf.rb]
+  spec.license       = 'MIT'
 
-  spec.files         = Dir['README.md', 'ext/**/*', 'lib/**/*.rb']
+  spec.files         = Dir['LICENSE.txt', 'README.md', 'ext/**/*', 'lib/**/*.rb']
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
