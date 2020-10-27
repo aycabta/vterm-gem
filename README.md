@@ -1,3 +1,5 @@
+![GitHub Actions status](https://github.com/aycabta/vterm-gem/workflows/CI/badge.svg)
+
 # VTerm
 
 This is a libvterm Ruby binding.
