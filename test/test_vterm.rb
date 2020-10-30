@@ -55,6 +55,9 @@ class VTerm::Test < Test::Unit::TestCase
     vterm.write("aiueo\e[6n")
     assert_equal("\e[1;", vterm.read(4))
     assert_equal("6R", vterm.read(4))
+    assert_raise(ArgumentError, 'buffer size must be unspecified or only one') {
+      vterm.read(0, 1)
+    }
   end
 
   def test_width
