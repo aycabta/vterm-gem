@@ -186,8 +186,7 @@ rb_vterm_read(int argc, VALUE *argv, VALUE self)
             bufsize = specified_size;
         }
     } else if (argc != 0) {
-        // TODO argument error
-        return Qnil;
+        rb_raise(rb_eArgError, "buffer size must be unspecified or only one");
     }
     if (bufsize == 0) {
         return rb_str_new_cstr("");
