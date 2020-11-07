@@ -43,6 +43,20 @@ class VTerm::Test < Test::Unit::TestCase
     end
   end
 
+  def test_screen_cell_char_out_of_range
+    vterm = VTerm.new(1, 20)
+    vterm.set_utf8(true)
+
+    screen = vterm.screen
+    screen.reset(true)
+
+    vterm.write('Hello')
+    rows, cols = vterm.size
+    assert_raise(RuntimeError, '#cell_at error') do
+      screen.cell_at(rows.size, cols.size)
+    end
+  end
+
   def test_read
     vterm = VTerm.new(1, 20)
     vterm.set_utf8(true)

@@ -295,7 +295,6 @@ rb_vterm_screen_cell_at(VALUE self, VALUE row, VALUE col)
     result = vterm_screen_get_cell(vt_screen_data->vtscreen, pos, &cell);
     if (result == 0) {
         rb_raise(rb_eRuntimeError, "#cell_at error");
-        return Qnil;
     }
     rb_attrs = rb_struct_new(
         sVTermScreenCellAttrs,
