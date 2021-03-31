@@ -129,12 +129,10 @@ rb_vterm_screen(VALUE self)
 {
     vterm_data_t *vt_data;
     vterm_screen_data_t *vt_screen_data;
-    ID screen_new_id;
     VALUE vt_screen;
 
     vt_data = (vterm_data_t*)DATA_PTR(self);
-    screen_new_id = rb_intern("new");
-    vt_screen = rb_funcall(cVTermScreen, screen_new_id, 0);
+    vt_screen = rb_vterm_screen_alloc(cVTermScreen);
 
     vt_screen_data = malloc(sizeof(vterm_screen_data_t));
     vt_screen_data->vtscreen = vterm_obtain_screen(vt_data->vt);
